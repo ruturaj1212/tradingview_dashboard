@@ -1,396 +1,462 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0e1a">
-    <title>Institutional Trading Dashboard | Live Charts</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background: linear-gradient(135deg, #0a0e1a 0%, #0f1322 100%);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
-            color: #eef2ff;
-            padding: 16px;
-            padding-bottom: 80px;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 12px 0;
-        }
-        .header h1 {
-            font-size: 1.6rem;
-            background: linear-gradient(135deg, #a5f3fc, #818cf8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .index-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-        .index-tabs::-webkit-scrollbar { display: none; }
-        .tab {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(71, 85, 105, 0.4);
-            border-radius: 60px;
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            white-space: nowrap;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .tab.active {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border-color: #22c55e;
-            color: white;
-        }
-        .price-card {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(129, 140, 248, 0.05));
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .live-price {
-            font-size: 2.5rem;
-            font-weight: 700;
-            font-family: monospace;
-        }
-        .manual-input {
-            margin-top: 14px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .manual-input input {
-            background: #0f172a;
-            border: 1px solid #334155;
-            padding: 12px 16px;
-            border-radius: 60px;
-            color: white;
-            font-size: 1rem;
-            width: 160px;
-            text-align: center;
-        }
-        .manual-input button {
-            background: #818cf8;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 60px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .refresh-btn { background: #334155; }
-        .card {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(8px);
-            border-radius: 24px;
-            border: 1px solid rgba(71, 85, 105, 0.4);
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-        .card-header {
-            padding: 16px 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-bottom: 1px solid #334155;
-            font-weight: 700;
-        }
-        .card-body { padding: 16px 20px; }
-        .level-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px dashed rgba(51, 65, 85, 0.5);
-        }
-        .level-label { color: #94a3b8; font-size: 0.85rem; }
-        .level-value { font-weight: 700; font-family: monospace; }
-        .prob-bar {
-            background: #1e293b;
-            border-radius: 40px;
-            height: 8px;
-            margin: 8px 0;
-            overflow: hidden;
-        }
-        .prob-fill {
-            background: linear-gradient(90deg, #ef4444, #22c55e);
-            height: 100%;
-            border-radius: 40px;
-        }
-        .verdict-box {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 16px;
-            padding: 14px;
-            margin-top: 12px;
-            text-align: center;
-            font-size: 0.85rem;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            padding: 16px;
-            color: #475569;
-            font-size: 0.7rem;
-        }
-        .chart-container {
-            margin-bottom: 20px;
-            border-radius: 24px;
-            overflow: hidden;
-            background: #131722;
-        }
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.6s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        button, .tab { transition: all 0.2s ease; }
-        button:active, .tab:active { transform: scale(0.96); }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0e1a" />
+
+<title>Institutional Trading Dashboard</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:linear-gradient(135deg,#0a0e1a,#0f172a);
+    color:white;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    padding:16px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.header h1{
+    font-size:2rem;
+    background:linear-gradient(90deg,#22c55e,#818cf8);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.index-tabs{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    margin-bottom:20px;
+}
+
+.tab{
+    padding:10px 18px;
+    border-radius:999px;
+    background:#1e293b;
+    cursor:pointer;
+    white-space:nowrap;
+    border:1px solid #334155;
+}
+
+.tab.active{
+    background:#22c55e;
+    border-color:#22c55e;
+}
+
+.chart-container{
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.price-card{
+    background:#111827;
+    border:1px solid #334155;
+    padding:20px;
+    border-radius:24px;
+    margin-bottom:20px;
+    text-align:center;
+}
+
+.live-price{
+    font-size:2.4rem;
+    font-weight:bold;
+    margin-top:10px;
+    font-family:monospace;
+}
+
+.manual-input{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-top:15px;
+    flex-wrap:wrap;
+}
+
+.manual-input input{
+    padding:12px;
+    border-radius:999px;
+    border:none;
+    background:#0f172a;
+    color:white;
+    width:150px;
+    text-align:center;
+}
+
+.manual-input button{
+    padding:12px 18px;
+    border:none;
+    border-radius:999px;
+    background:#818cf8;
+    color:white;
+    cursor:pointer;
+}
+
+.card{
+    background:#111827;
+    border-radius:20px;
+    border:1px solid #334155;
+    margin-bottom:16px;
+    overflow:hidden;
+}
+
+.card-header{
+    padding:14px 18px;
+    background:#0f172a;
+    font-weight:bold;
+    border-bottom:1px solid #334155;
+}
+
+.card-body{
+    padding:18px;
+}
+
+.level-item{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px dashed #334155;
+}
+
+.level-value{
+    font-family:monospace;
+    font-weight:bold;
+}
+
+.footer{
+    text-align:center;
+    margin-top:20px;
+    color:#64748b;
+    font-size:0.75rem;
+}
+
+.loading{
+    color:#22c55e;
+}
+</style>
 </head>
+
 <body>
+
 <div id="root"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
 
 <script type="text/babel">
+
 const { useState, useEffect, useCallback } = React;
 
-// Index Configuration with TradingView symbols
 const INDICES = {
-    NIFTY: { symbol: "NSE:NIFTY", name: "🇮🇳 NIFTY 50", base: 23664, mult: 1 },
-    SENSEX: { symbol: "BSE:SENSEX", name: "📈 SENSEX", base: 78450, mult: 0.7 },
-    BANKNIFTY: { symbol: "NSE:NIFTYBANK", name: "🏦 BANK NIFTY", base: 50250, mult: 2.5 },
-    FINNIFTY: { symbol: "NSE:FINNIFTY", name: "💰 FIN NIFTY", base: 19800, mult: 1.8 },
-    MIDCAP: { symbol: "NSE:MIDCPNIFTY", name: "📊 MIDCAP", base: 11200, mult: 1.2 }
+    NIFTY: {
+        tv: "NSE:NIFTY",
+        yahoo: "^NSEI",
+        name: "🇮🇳 NIFTY"
+    },
+
+    SENSEX: {
+        tv: "BSE:SENSEX",
+        yahoo: "^BSESN",
+        name: "📈 SENSEX"
+    },
+
+    BANKNIFTY: {
+        tv: "NSE:BANKNIFTY",
+        yahoo: "^NSEBANK",
+        name: "🏦 BANK NIFTY"
+    }
 };
 
-// TradingView Chart Widget Loader
-let currentWidget = null;
+function loadTradingView(containerId, symbol){
 
-function loadTradingViewChart(containerId, symbol) {
-    // Remove existing widget if any
-    if (currentWidget) {
-        try { currentWidget.remove(); } catch(e) {}
-        currentWidget = null;
-    }
-    
-    // Clear container
     const container = document.getElementById(containerId);
-    if (container) container.innerHTML = '';
-    
-    // Load TradingView script if not already loaded
-    if (!document.querySelector('script[src="https://s3.tradingview.com/tv.js"]')) {
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/tv.js';
-        script.async = true;
-        script.onload = () => createWidget(containerId, symbol);
-        document.head.appendChild(script);
-    } else {
-        createWidget(containerId, symbol);
-    }
-}
 
-function createWidget(containerId, symbol) {
-    if (typeof TradingView === 'undefined') {
-        setTimeout(() => createWidget(containerId, symbol), 500);
-        return;
-    }
-    
-    currentWidget = new TradingView.widget({
-        width: "100%",
-        height: 380,
-        symbol: symbol,
-        interval: "15",
-        timezone: "Asia/Kolkata",
-        theme: "dark",
-        style: "1",
-        locale: "in",
-        toolbar_bg: "#0f1322",
-        enable_publishing: false,
-        allow_symbol_change: true,
-        container_id: containerId,
-        hide_side_toolbar: false,
-        save_image: false,
-        studies: [
-            "MASimple@tv-basicstudies",
-            "RSI@tv-basicstudies", 
-            "MACD@tv-basicstudies",
-            "BB@tv-basicstudies"
-        ]
-    });
-}
+    if(!container) return;
 
-async function fetchLivePrice(symbol) {
-    try {
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol.replace('NSE:', '').replace('BSE:', '')}`;
-        const response = await fetch(url, { cache: 'no-store' });
-        const data = await response.json();
-        const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
-        if (price && price > 0) return Math.round(price * 100) / 100;
-        return null;
-    } catch (error) {
-        return null;
-    }
-}
+    container.innerHTML = "";
 
-function generateAnalysis(indexKey, price) {
-    const mult = INDICES[indexKey].mult;
-    const resistance1 = Math.round(price + (35 * mult));
-    const resistance2 = Math.round(price + (70 * mult));
-    const support1 = Math.round(price - (40 * mult));
-    const support2 = Math.round(price - (100 * mult));
-    const entryShort = Math.round(price + (20 * mult));
-    const slShort = Math.round(price + (70 * mult));
-    const target1 = Math.round(price - (45 * mult));
-    const target2 = Math.round(price - (95 * mult));
-    const maxPain = Math.round(price - (indexKey === "NIFTY" ? 164 : (150 * mult)));
-    let sentBull = 38, sentBear = 62;
-    if (indexKey === "BANKNIFTY" || indexKey === "FINNIFTY") { sentBull = 42; sentBear = 58; }
-    if (price > resistance1) { sentBull = 55; sentBear = 45; }
-    let trendText = "📊 SIDEWAYS to BEARISH";
-    let biasColor = "#f59e0b";
-    if (price > resistance2) { trendText = "🚀 BULLISH"; biasColor = "#22c55e"; }
-    if (price < support2) { trendText = "🔥 BEARISH"; biasColor = "#ef4444"; }
-    const vix = indexKey === "NIFTY" ? "18.4" : "19.2";
-    const trapWarning = `⚠️ Bull Trap likely above ${resistance2}`;
-    
-    return { price, resistance1, resistance2, support1, support2, entryShort, slShort, target1, target2, maxPain, sentBull, sentBear, trendText, biasColor, vix, trapWarning, confidence: 7.5 };
-}
+    function createWidget(){
 
-function Dashboard() {
-    const [selectedIndex, setSelectedIndex] = useState("NIFTY");
-    const [currentPrice, setCurrentPrice] = useState(INDICES.NIFTY.base);
-    const [manualPrice, setManualPrice] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [lastUpdate, setLastUpdate] = useState(new Date());
-    const analysis = generateAnalysis(selectedIndex, currentPrice);
-    
-    useEffect(() => {
-        // Load TradingView chart when index changes
-        loadTradingViewChart("tv_chart", INDICES[selectedIndex].symbol);
-    }, [selectedIndex]);
-    
-    const loadLivePrice = useCallback(async () => {
-        setLoading(true);
-        const price = await fetchLivePrice(INDICES[selectedIndex].symbol);
-        if (price && price > 0) {
-            setCurrentPrice(price);
-            setManualPrice("");
+        if(!window.TradingView){
+            setTimeout(createWidget,500);
+            return;
         }
-        setLastUpdate(new Date());
-        setLoading(false);
-    }, [selectedIndex]);
-    
-    useEffect(() => {
-        loadLivePrice();
-        const interval = setInterval(loadLivePrice, 60000);
-        return () => clearInterval(interval);
-    }, [loadLivePrice]);
-    
-    const handleManualSubmit = () => {
-        const price = parseFloat(manualPrice);
-        if (!isNaN(price) && price > 0) setCurrentPrice(price);
+
+        new TradingView.widget({
+            autosize:true,
+            symbol:symbol,
+            interval:"15",
+            timezone:"Asia/Kolkata",
+            theme:"dark",
+            style:"1",
+            locale:"en",
+            toolbar_bg:"#131722",
+            enable_publishing:false,
+            allow_symbol_change:false,
+            container_id:containerId,
+            studies:[
+                "RSI@tv-basicstudies",
+                "MACD@tv-basicstudies",
+                "BB@tv-basicstudies"
+            ]
+        });
+    }
+
+    if(!document.querySelector("#tradingview-script")){
+
+        const script=document.createElement("script");
+
+        script.id="tradingview-script";
+
+        script.src="https://s3.tradingview.com/tv.js";
+
+        script.onload=createWidget;
+
+        document.head.appendChild(script);
+
+    } else {
+
+        createWidget();
+    }
+}
+
+async function fetchPrice(symbol){
+
+    try{
+
+        const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}`;
+
+        const response=await fetch(url);
+
+        const data=await response.json();
+
+        return data?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
+
+    }catch(err){
+
+        console.log(err);
+
+        return null;
+    }
+}
+
+function generateAnalysis(price){
+
+    return {
+
+        resistance1:Math.round(price+50),
+        support1:Math.round(price-50),
+        target:Math.round(price-120),
+        stoploss:Math.round(price+80),
+        sentiment:price % 2 === 0 ? "BEARISH" : "BULLISH"
+
     };
-    
-    const formatPrice = (p) => p.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    
+}
+
+function Dashboard(){
+
+    const [selected,setSelected]=useState("NIFTY");
+
+    const [price,setPrice]=useState(0);
+
+    const [manual,setManual]=useState("");
+
+    const [loading,setLoading]=useState(false);
+
+    const [lastUpdate,setLastUpdate]=useState("");
+
+    const current=INDICES[selected];
+
+    const analysis=generateAnalysis(price);
+
+    const loadPrice=useCallback(async()=>{
+
+        setLoading(true);
+
+        const p=await fetchPrice(current.yahoo);
+
+        if(p){
+            setPrice(Math.round(p));
+        }
+
+        setLastUpdate(new Date().toLocaleTimeString());
+
+        setLoading(false);
+
+    },[current]);
+
+    useEffect(()=>{
+
+        loadTradingView("tv_chart",current.tv);
+
+    },[current]);
+
+    useEffect(()=>{
+
+        loadPrice();
+
+        const interval=setInterval(loadPrice,60000);
+
+        return ()=>clearInterval(interval);
+
+    },[loadPrice]);
+
+    function handleManual(){
+
+        const p=parseFloat(manual);
+
+        if(!isNaN(p)){
+            setPrice(p);
+        }
+    }
+
     return (
+
         <div className="container">
+
             <div className="header">
-                <h1>📊 Institutional Dashboard</h1>
-                <p>TradingView Charts + SMC Analysis + Options Flow</p>
+                <h1>Institutional Dashboard</h1>
+                <p>TradingView + Live Analysis</p>
             </div>
-            
+
             <div className="index-tabs">
-                {Object.keys(INDICES).map(key => (
-                    <div key={key} className={`tab ${selectedIndex === key ? 'active' : ''}`} onClick={() => setSelectedIndex(key)}>
+
+                {Object.keys(INDICES).map(key=>(
+
+                    <div
+                        key={key}
+                        className={`tab ${selected===key ? "active":""}`}
+                        onClick={()=>setSelected(key)}
+                    >
                         {INDICES[key].name}
                     </div>
+
                 ))}
+
             </div>
-            
-            {/* TradingView Live Chart */}
+
             <div className="chart-container">
-                <div id="tv_chart" style={{ height: '400px', background: '#131722' }}></div>
+                <div id="tv_chart" style={{height:"420px"}}></div>
             </div>
-            
+
             <div className="price-card">
-                <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>LIVE / MANUAL PRICE</div>
-                <div className="live-price">{loading ? <span className="loading-spinner"></span> : `₹ ${formatPrice(currentPrice)}`}</div>
-                <div className="price-change">{analysis.trendText}</div>
+
+                <div>LIVE PRICE</div>
+
+                <div className="live-price">
+                    {loading ? "Loading..." : `₹ ${price.toLocaleString("en-IN")}`}
+                </div>
+
+                <div style={{
+                    color:analysis.sentiment==="BULLISH"
+                    ? "#22c55e"
+                    : "#ef4444",
+                    marginTop:"8px"
+                }}>
+                    {analysis.sentiment}
+                </div>
+
                 <div className="manual-input">
-                    <input type="number" placeholder="Enter price" value={manualPrice} onChange={(e) => setManualPrice(e.target.value)} />
-                    <button onClick={handleManualSubmit}>Set</button>
-                    <button className="refresh-btn" onClick={loadLivePrice}>⟳ Refresh</button>
+
+                    <input
+                        type="number"
+                        placeholder="Manual Price"
+                        value={manual}
+                        onChange={(e)=>setManual(e.target.value)}
+                    />
+
+                    <button onClick={handleManual}>
+                        Set Price
+                    </button>
+
+                    <button onClick={loadPrice}>
+                        Refresh
+                    </button>
+
                 </div>
-                <div style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '10px' }}>Updated: {lastUpdate.toLocaleTimeString()}</div>
+
+                <div style={{
+                    marginTop:"10px",
+                    color:"#64748b",
+                    fontSize:"0.75rem"
+                }}>
+                    Updated: {lastUpdate}
+                </div>
+
             </div>
-            
+
             <div className="card">
-                <div className="card-header">🎯 TRADE SETUP</div>
-                <div className="card-body">
-                    <div className="level-item"><span className="level-label">📉 SELL Entry</span><span className="level-value" style={{color:'#ef4444'}}>{formatPrice(analysis.entryShort)}</span></div>
-                    <div className="level-item"><span className="level-label">🛑 Stop Loss</span><span className="level-value">{formatPrice(analysis.slShort)}</span></div>
-                    <div className="level-item"><span className="level-label">🎯 Target → Target 2</span><span className="level-value">{formatPrice(analysis.target1)} → {formatPrice(analysis.target2)}</span></div>
-                    <div className="level-item"><span className="level-label">📊 Risk : Reward</span><span className="level-value">1:1.7</span></div>
+
+                <div className="card-header">
+                    Trade Setup
                 </div>
-            </div>
-            
-            <div className="card">
-                <div className="card-header">📈 OPTIONS SENTIMENT</div>
+
                 <div className="card-body">
-                    <div className="level-item"><span className="level-label">🐂 CALL</span><span className="level-value">{analysis.sentBull}%</span></div>
-                    <div className="prob-bar"><div className="prob-fill" style={{width: `${analysis.sentBull}%`}}></div></div>
-                    <div className="level-item"><span className="level-label">🐻 PUT</span><span className="level-value">{analysis.sentBear}%</span></div>
-                    <div className="prob-bar"><div className="prob-fill" style={{width: `${analysis.sentBear}%`, background:'#ef4444'}}></div></div>
-                    <div className="level-item"><span className="level-label">🎯 Max Pain</span><span className="level-value" style={{color:'#ef4444'}}>{formatPrice(analysis.maxPain)}</span></div>
-                    <div className="level-item"><span className="level-label">📉 India VIX</span><span className="level-value">{analysis.vix}</span></div>
+
+                    <div className="level-item">
+                        <span>Resistance</span>
+                        <span className="level-value">
+                            {analysis.resistance1}
+                        </span>
+                    </div>
+
+                    <div className="level-item">
+                        <span>Support</span>
+                        <span className="level-value">
+                            {analysis.support1}
+                        </span>
+                    </div>
+
+                    <div className="level-item">
+                        <span>Target</span>
+                        <span className="level-value">
+                            {analysis.target}
+                        </span>
+                    </div>
+
+                    <div className="level-item">
+                        <span>Stop Loss</span>
+                        <span className="level-value">
+                            {analysis.stoploss}
+                        </span>
+                    </div>
+
                 </div>
+
             </div>
-            
-            <div className="card">
-                <div className="card-header">🎯 FINAL VERDICT</div>
-                <div className="card-body">
-                    <div className="level-item"><span className="level-label">Market Bias</span><span className="level-value" style={{color: analysis.biasColor}}>{analysis.trendText}</span></div>
-                    <div className="level-item"><span className="level-label">Confidence</span><span className="level-value">{analysis.confidence}/10</span></div>
-                    <div className="verdict-box">⚠️ {analysis.trapWarning}<br/>🛡️ Use strict stop loss</div>
-                </div>
-            </div>
-            
+
             <div className="footer">
-                Data: TradingView Widgets + Yahoo Finance · Institutional Trading Logic<br/>
-                ⚠️ Educational Purpose Only
+                Educational Purpose Only
             </div>
+
         </div>
     );
 }
 
-ReactDOM.render(<Dashboard />, document.getElementById("root"));
+const root = ReactDOM.createRoot(
+    document.getElementById("root")
+);
+
+root.render(<Dashboard />);
+
 </script>
+
 </body>
 </html>
