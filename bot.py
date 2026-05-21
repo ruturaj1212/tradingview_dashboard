@@ -22,9 +22,9 @@ user_alerts = {}
 # INDICES (Twelve Data Symbols)
 # ========================
 INDICES = {
-    "NIFTY": {"symbol": "NIFTY_50", "name": "🇮🇳 NIFTY 50", "mult": 1},
-    "SENSEX": {"symbol": "SENSEX", "name": "📈 SENSEX", "mult": 0.7},
-    "BANKNIFTY": {"symbol": "NIFTY_BANK", "name": "🏦 BANK NIFTY", "mult": 2.5},
+    "NIFTY": {"symbol": "NIFTY", "name": "🇮🇳 NIFTY 50", "mult": 1},
+    "SENSEX": {"symbol": "BSE:SENSEX", "name": "📈 SENSEX", "mult": 0.7},
+    "BANKNIFTY": {"symbol": "NIFTY BANK", "name": "🏦 BANK NIFTY", "mult": 2.5},
 }
 
 # Live price storage
