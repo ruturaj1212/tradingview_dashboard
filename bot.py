@@ -160,23 +160,31 @@ def get_price(index_key):
 # TEST FINNHUB CONNECTION
 # ========================
 def test_finnhub_connection():
-    """Verify API key works before starting"""
     try:
-        url = f"https://finnhub.io/api/v1/quote?symbol=NSE:NIFTY50&token={FINNHUB_API_KEY}"
+        url = f"https://finnhub.io/api/v1/quote?symbol=NIFTY50&token={FINNHUB_API_KEY}"
         response = requests.get(url, timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("c"):
-                print(f"✅ Finnhub API key works! Current NIFTY: ₹{data['c']}")
-                return True
-            else:
-                print("⚠️ Finnhub returned empty response. Check symbol.")
-                return False
-        else:
-            print(f"❌ Finnhub API error: {response.status_code}")
+
+        print("Raw response:", response.text)
+
+        if response.status_code != 200:
+            print(f"❌ HTTP error: {response.status_code}")
             return False
+
+        data = response.json()
+
+        if "error" in data:
+            print("❌ API error:", data["error"])
+            return False
+
+        if data and "c" in data and data["c"] is not None:
+            print(f"✅ Working! Current value: {data['c']}")
+            return True
+        else:
+            print("⚠️ Empty or unsupported symbol response:", data)
+            return False
+
     except Exception as e:
-        print(f"❌ Cannot connect to Finnhub: {e}")
+        print(f"❌ Connection error: {e}")
         return False
 
 # ========================
