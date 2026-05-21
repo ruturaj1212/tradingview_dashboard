@@ -21,10 +21,11 @@ user_alerts = {}
 # ========================
 # INDICES (Twelve Data Symbols)
 # ========================
+
 INDICES = {
-    "NIFTY": {"symbol": "NIFTY", "name": "🇮🇳 NIFTY 50", "mult": 1},
+    "NIFTY": {"symbol": "NSE:NIFTY 50", "name": "🇮🇳 NIFTY 50", "mult": 1},
     "SENSEX": {"symbol": "BSE:SENSEX", "name": "📈 SENSEX", "mult": 0.7},
-    "BANKNIFTY": {"symbol": "NIFTY BANK", "name": "🏦 BANK NIFTY", "mult": 2.5},
+    "BANKNIFTY": {"symbol": "NSE:BANKNIFTY", "name": "🏦 BANK NIFTY", "mult": 2.5},
 }
 
 # Live price storage
@@ -40,12 +41,13 @@ current_prices = {
 def fetch_price(index_key):
     try:
         symbol = INDICES[index_key]["symbol"]
-        url = f"https://api.twelvedata.com/price?symbol={symbol}&apikey={TWELVEDATA_API_KEY}"
+
+        url = f"https://api.twelvedata.com/quote?symbol={symbol}&apikey={TWELVEDATA_API_KEY}"
 
         response = requests.get(url, timeout=5)
         data = response.json()
 
-        price = data.get("price")
+        price = data.get("close") or data.get("price")
 
         if price:
             price = float(price)
