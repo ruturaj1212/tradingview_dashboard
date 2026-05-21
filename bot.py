@@ -10,8 +10,8 @@ from datetime import datetime
 # ========================
 # CONFIGURATION - REPLACE THESE
 # ========================
-TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"  # ← From @BotFather
-FINNHUB_API_KEY = "YOUR_FINNHUB_API_KEY"        # ← From finnhub.io
+TELEGRAM_BOT_TOKEN = "8946149776:AAFPJtToVIjgJI01Lsra8Pyjzg_T2YgNGoQ"  # ← From @BotFather
+FINNHUB_API_KEY = "d87he1hr01qmhakfqod0d87he1hr01qmhakfqodg"        # ← From finnhub.io
 
 # ========================
 # TELEGRAM BOT SETUP
