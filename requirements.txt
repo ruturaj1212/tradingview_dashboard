@@ -1,0 +1,9 @@
+pyTelegramBotAPI
+requests
+websocket-client
+pandas
+numpy
+ta
+yfinance
+openai
+plotly
