@@ -8,8 +8,8 @@ from datetime import datetime
 # ========================
 # CONFIGURATION
 # ========================
-TELEGRAM_BOT_TOKEN = "21dd0d043bc843c7923479ba7663112c"
-TWELVEDATA_API_KEY = "8946149776:AAFPJtToVIjgJI01Lsra8Pyjzg_T2YgNGoQ"
+TELEGRAM_BOT_TOKEN = "8946149776:AAFPJtToVIjgJI01Lsra8Pyjzg_T2YgNGoQ"
+TWELVEDATA_API_KEY = "21dd0d043bc843c7923479ba7663112c"
 
 # ========================
 # TELEGRAM BOT SETUP
