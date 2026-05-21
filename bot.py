@@ -11,7 +11,7 @@ import ssl
 # CONFIGURATION - REPLACE THESE
 # ========================
 TELEGRAM_BOT_TOKEN = "8946149776:AAFPJtToVIjgJI01Lsra8Pyjzg_T2YgNGoQ"
-TWELVEDATA_API_KEY = "21dd0d043bc843c7923479ba7663112c"
+TWELVEDATA_API_KEY = "d87he1hr01qmhakfqod0d87he1hr01qmhakfqodg"
 
 # ========================
 # TELEGRAM BOT SETUP
