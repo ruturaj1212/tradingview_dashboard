@@ -85,7 +85,7 @@ def on_websocket_open(ws):
 
 def start_websocket():
     global ws_connected
-    websocket_url = f"wss://ws.twelvedata.com/v1/quotes/price?apikey={TWELVEDATA_API_KEY}"
+    websocket_url = f"https://finnhub.io/api/v1/quote?symbol=NSE:NIFTY50&token=d87he1hr01qmhakfqod0d87he1hr01qmhakfqodg"
     ws = websocket.WebSocketApp(
         websocket_url,
         on_open=on_websocket_open,
