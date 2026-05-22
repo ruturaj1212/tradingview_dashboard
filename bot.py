@@ -12,8 +12,8 @@ from datetime import datetime
 
 import sys
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-GROWW_ACCESS_TOKEN = os.getenv("GROWW_ACCESS_TOKEN")
+TELEGRAM_BOT_TOKEN = os.getenv("8946149776:AAFPJtToVIjgJI01Lsra8Pyjzg_T2YgNGoQ")
+GROWW_ACCESS_TOKEN = os.getenv("1gUnYn&(_Ce*7C@-(5M!%m$OZSBKbpS8")
 
 if not TELEGRAM_BOT_TOKEN:
     print("❌ TELEGRAM_BOT_TOKEN missing")
