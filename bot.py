@@ -1,420 +1,201 @@
 import telebot
-import requests
 import threading
 import time
-import os
 from datetime import datetime
+from growwapi import GrowwAPI
 
-# ========================
+# =========================
 # CONFIG
-# ========================
-
-
-import sys
+# =========================
 
 TELEGRAM_BOT_TOKEN = "8946149776:AAFPJtToVIjgJI01Lsra8Pyjzg_T2YgNGoQ"
-GROWW_ACCESS_TOKEN = "eyJraWQiOiJaTUtjVXciLCJhbGciOiJFUzI1NiJ9.eyJleHAiOjI1Njc4MzYyODksImlhdCI6MTc3OTQzNjI4OSwibmJmIjoxNzc5NDM2Mjg5LCJzdWIiOiJ7XCJ0b2tlblJlZklkXCI6XCI1OTExMTJiYS0xZWFjLTQ1MWQtODczYy03NDRmZGFlZWY1ZDdcIixcInZlbmRvckludGVncmF0aW9uS2V5XCI6XCJlMzFmZjIzYjA4NmI0MDZjODg3NGIyZjZkODQ5NTMxM1wiLFwidXNlckFjY291bnRJZFwiOlwiYjRmOTM2MGUtN2Q0MC00MjAzLWIzMDEtZGQwMjg5ZTFiNWYxXCIsXCJkZXZpY2VJZFwiOlwiYTY0MTI3NGUtN2Q1Yy01ODAwLTliZWYtOTk1YThjZmQ2MTBmXCIsXCJzZXNzaW9uSWRcIjpcIjAzYzhkNTVkLTkxZGQtNDhlZi1hMzVlLWViN2VjZTUzMzE5NFwiLFwiYWRkaXRpb25hbERhdGFcIjpcIno1NC9NZzltdjE2WXdmb0gvS0EwYkk5Y2o3LzY2TkhZVjJGL3p0cld3MHhSTkczdTlLa2pWZDNoWjU1ZStNZERhWXBOVi9UOUxIRmtQejFFQisybTdRPT1cIixcInJvbGVcIjpcImF1dGgtdG90cFwiLFwic291cmNlSXBBZGRyZXNzXCI6XCIyMDMuOTIuNjIuMTMwLDE3Mi43MC4yMTguODgsMzUuMjQxLjIzLjEyM1wiLFwidHdvRmFFeHBpcnlUc1wiOjI1Njc4MzYyODk4NzcsXCJ2ZW5kb3JOYW1lXCI6XCJncm93d0FwaVwifSIsImlzcyI6ImFwZXgtYXV0aC1wcm9kLWFwcCJ9.6T3-xb36ZcD9rc0ik-yD97g6WueoYorqqrLF_LBCJJYT_qtjHJu8i36cY3wYsz2lBTR5cuVLkY-w7N9wAX52Pw"
 
-if not TELEGRAM_BOT_TOKEN:
-    print("❌ TELEGRAM_BOT_TOKEN missing")
-    sys.exit()
-
-if not GROWW_ACCESS_TOKEN:
-    print("❌ GROWW_ACCESS_TOKEN missing")
-    sys.exit()
-
-TELEGRAM_BOT_TOKEN = "8946149776:AAFPJtToVIjgJI01Lsra8Pyjzg_T2YgNGoQ"
-GROWW_ACCESS_TOKEN = "eyJraWQiOiJaTUtjVXciLCJhbGciOiJFUzI1NiJ9.eyJleHAiOjI1Njc4MzYyODksImlhdCI6MTc3OTQzNjI4OSwibmJmIjoxNzc5NDM2Mjg5LCJzdWIiOiJ7XCJ0b2tlblJlZklkXCI6XCI1OTExMTJiYS0xZWFjLTQ1MWQtODczYy03NDRmZGFlZWY1ZDdcIixcInZlbmRvckludGVncmF0aW9uS2V5XCI6XCJlMzFmZjIzYjA4NmI0MDZjODg3NGIyZjZkODQ5NTMxM1wiLFwidXNlckFjY291bnRJZFwiOlwiYjRmOTM2MGUtN2Q0MC00MjAzLWIzMDEtZGQwMjg5ZTFiNWYxXCIsXCJkZXZpY2VJZFwiOlwiYTY0MTI3NGUtN2Q1Yy01ODAwLTliZWYtOTk1YThjZmQ2MTBmXCIsXCJzZXNzaW9uSWRcIjpcIjAzYzhkNTVkLTkxZGQtNDhlZi1hMzVlLWViN2VjZTUzMzE5NFwiLFwiYWRkaXRpb25hbERhdGFcIjpcIno1NC9NZzltdjE2WXdmb0gvS0EwYkk5Y2o3LzY2TkhZVjJGL3p0cld3MHhSTkczdTlLa2pWZDNoWjU1ZStNZERhWXBOVi9UOUxIRmtQejFFQisybTdRPT1cIixcInJvbGVcIjpcImF1dGgtdG90cFwiLFwic291cmNlSXBBZGRyZXNzXCI6XCIyMDMuOTIuNjIuMTMwLDE3Mi43MC4yMTguODgsMzUuMjQxLjIzLjEyM1wiLFwidHdvRmFFeHBpcnlUc1wiOjI1Njc4MzYyODk4NzcsXCJ2ZW5kb3JOYW1lXCI6XCJncm93d0FwaVwifSIsImlzcyI6ImFwZXgtYXV0aC1wcm9kLWFwcCJ9.6T3-xb36ZcD9rc0ik-yD97g6WueoYorqqrLF_LBCJJYT_qtjHJu8i36cY3wYsz2lBTR5cuVLkY-w7N9wAX52Pw"
-
-# ========================
-# TELEGRAM BOT
-# ========================
+GROWW_ACCESS_TOKEN = "eyJraWQiOiJaTUtjVXciLCJhbGciOiJFUzI1NiJ9.eyJleHAiOjI1Njc4Mzg2NDYsImlhdCI6MTc3OTQzODY0NiwibmJmIjoxNzc5NDM4NjQ2LCJzdWIiOiJ7XCJ0b2tlblJlZklkXCI6XCI4ZmU5NjMwYS1mZTkzLTQ3Y2YtODEzZS04MTZmMGQzZDQ4MmFcIixcInZlbmRvckludGVncmF0aW9uS2V5XCI6XCJlMzFmZjIzYjA4NmI0MDZjODg3NGIyZjZkODQ5NTMxM1wiLFwidXNlckFjY291bnRJZFwiOlwiYjRmOTM2MGUtN2Q0MC00MjAzLWIzMDEtZGQwMjg5ZTFiNWYxXCIsXCJkZXZpY2VJZFwiOlwiYTY0MTI3NGUtN2Q1Yy01ODAwLTliZWYtOTk1YThjZmQ2MTBmXCIsXCJzZXNzaW9uSWRcIjpcIjM3OTY4YzIyLTYyNzItNDBmZC04YjRmLWY2ODU3YjBmYWZjY1wiLFwiYWRkaXRpb25hbERhdGFcIjpcIno1NC9NZzltdjE2WXdmb0gvS0EwYkk5Y2o3LzY2TkhZVjJGL3p0cld3MHhSTkczdTlLa2pWZDNoWjU1ZStNZERhWXBOVi9UOUxIRmtQejFFQisybTdRPT1cIixcInJvbGVcIjpcImF1dGgtdG90cFwiLFwic291cmNlSXBBZGRyZXNzXCI6XCIyMDMuOTIuNjIuMTMwLDE3Mi43MC4yMTguMTM1LDM1LjI0MS4yMy4xMjNcIixcInR3b0ZhRXhwaXJ5VHNcIjoyNTY3ODM4NjQ2NjA3LFwidmVuZG9yTmFtZVwiOlwiZ3Jvd3dBcGlcIn0iLCJpc3MiOiJhcGV4LWF1dGgtcHJvZC1hcHAifQ.4GPZUI41074vOgb6YWYgcIm-6pLavElcSJlFJkUVYKfqtTdGD-ngT7azcPz5alcDFLR6TIkYlaSQAMOfDLBAzw"
 
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 
-# ========================
-# GROWW API
-# ========================
+# =========================
+# INIT GROWW CLIENT
+# =========================
 
-BASE_URL = "https://api.groww.in/v1/live-data/ltp"
+groww = GrowwAPI(GROWW_ACCESS_TOKEN)
 
-HEADERS = {
-    "Accept": "application/json",
-    "Authorization": f"Bearer {GROWW_ACCESS_TOKEN}",
-    "X-API-VERSION": "1.0"
-}
-
-# ========================
-# INDICES
-# ========================
+# =========================
+# SYMBOL MAP (IMPORTANT FIX)
+# =========================
 
 INDICES = {
     "NIFTY": {
-        "symbol": "NSE_NIFTY",
-        "name": "🇮🇳 NIFTY 50",
-        "mult": 1
+        "exchange": groww.EXCHANGE_NSE,
+        "segment": groww.SEGMENT_CASH,
+        "symbol": "NIFTY"
     },
     "BANKNIFTY": {
-        "symbol": "NSE_BANKNIFTY",
-        "name": "🏦 BANK NIFTY",
-        "mult": 2.5
+        "exchange": groww.EXCHANGE_NSE,
+        "segment": groww.SEGMENT_CASH,
+        "symbol": "NIFTY BANK"
     },
     "SENSEX": {
-        "symbol": "BSE_SENSEX",
-        "name": "📈 SENSEX",
-        "mult": 0.7
+        "exchange": groww.EXCHANGE_BSE,
+        "segment": groww.SEGMENT_CASH,
+        "symbol": "SENSEX"
     }
 }
 
-# ========================
-# STORAGE
-# ========================
-
-current_prices = {
-    "NIFTY": None,
-    "BANKNIFTY": None,
-    "SENSEX": None
-}
-
+current_prices = {}
 user_alerts = {}
 
-# ========================
-# FETCH PRICE
-# ========================
+# =========================
+# FETCH PRICE (CORRECT SDK USAGE)
+# =========================
 
-def fetch_price(index_key):
-
+def fetch_price(key):
     try:
+        cfg = INDICES[key]
 
-        symbol = INDICES[index_key]["symbol"]
-
-        params = {
-            "segment": "CASH",
-            "exchange_symbols": symbol
-        }
-
-        response = requests.get(
-            BASE_URL,
-            headers=HEADERS,
-            params=params,
-            timeout=10
+        quote = groww.get_quote(
+            exchange=cfg["exchange"],
+            segment=cfg["segment"],
+            trading_symbol=cfg["symbol"]
         )
 
-        if response.status_code != 200:
-            print(f"❌ HTTP {response.status_code}: {response.text}")
-            return current_prices.get(index_key)
-
-        data = response.json()
-
-        print(f"📡 {index_key}:", data)
-
-        if data.get("status") != "SUCCESS":
-            print(f"❌ API Error: {data}")
-            return current_prices.get(index_key)
-
-        payload = data.get("payload", {})
-
-        # safer parsing
-        price = None
-
-        if isinstance(payload, dict):
-
-            if symbol in payload:
-                price = payload[symbol]
-
-            elif "last_price" in payload:
-                price = payload["last_price"]
+        price = quote.get("average_price") or quote.get("ltp") or quote.get("last_price")
 
         if price:
-
             price = float(price)
-
-            current_prices[index_key] = price
-
-            check_alerts(index_key, price)
-
+            current_prices[key] = price
+            check_alerts(key, price)
             return price
 
-        return current_prices.get(index_key)
-
     except Exception as e:
-        print(f"❌ Error fetching {index_key}: {e}")
-        return current_prices.get(index_key)
+        print("Error:", key, e)
 
-# ========================
-# BACKGROUND UPDATER
-# ========================
+    return current_prices.get(key)
 
-def price_updater():
 
-    print("📡 Live updater started...")
+def get_price(key):
+    return current_prices.get(key) or fetch_price(key)
 
-    while True:
-
-        try:
-
-            for key in INDICES:
-                fetch_price(key)
-
-            time.sleep(2)
-
-        except Exception as e:
-            print("❌ Updater crash:", e)
-            time.sleep(5)
-
-# ========================
-# GET PRICE
-# ========================
-
-def get_price(index_key):
-
-    price = current_prices.get(index_key)
-
-    if price:
-        return price
-
-    return fetch_price(index_key)
-
-# ========================
-# TEST CONNECTION
-# ========================
-
-def test_connection():
-
-    try:
-
-        params = {
-            "segment": "CASH",
-            "exchange_symbols": "NSE_NIFTY"
-        }
-
-        response = requests.get(
-            BASE_URL,
-            headers=HEADERS,
-            params=params,
-            timeout=10
-        )
-
-        print("📡 Raw Response:", response.text)
-
-        if response.status_code == 200:
-            print("✅ Groww API connected!")
-            return True
-
-        print("❌ API connection failed")
-        return False
-
-    except Exception as e:
-        print("❌ Connection failed:", e)
-        return False
-
-# ========================
+# =========================
 # ALERT SYSTEM
-# ========================
+# =========================
 
-def check_alerts(index_key, price):
-
-    for chat_id, alerts in user_alerts.items():
-
-        if index_key not in alerts:
+def check_alerts(key, price):
+    for chat_id, data in user_alerts.items():
+        if key not in data:
             continue
 
-        for alert_price in alerts[index_key][:]:
+        for level in data[key][:]:
+            if price >= level:
+                bot.send_message(chat_id,
+                    f"🚨 {key} ALERT\nTarget: {level}\nPrice: {price}"
+                )
+                data[key].remove(level)
 
-            if price >= alert_price:
+# =========================
+# YOUR STRATEGY ENGINE
+# =========================
 
-                try:
-
-                    bot.send_message(
-                        chat_id,
-                        f"""
-🚨 ALERT TRIGGERED
-
-📊 {index_key}
-🎯 Target: ₹{alert_price}
-💰 Current: ₹{price:.2f}
-"""
-                    )
-
-                    alerts[index_key].remove(alert_price)
-
-                except Exception as e:
-                    print("❌ Alert error:", e)
-
-# ========================
-# ANALYSIS ENGINE
-# ========================
-
-def generate_analysis(index_key, price):
-
+def analysis(key, price):
     if not price:
-        return "❌ Price unavailable"
+        return "No price available"
 
-    mult = INDICES[index_key]["mult"]
+    mult = 1 if key == "NIFTY" else 2.5
 
-    resistance1 = round(price + (35 * mult))
-    resistance2 = round(price + (70 * mult))
+    r1 = price + 35 * mult
+    r2 = price + 70 * mult
+    s1 = price - 40 * mult
+    s2 = price - 100 * mult
 
-    support1 = round(price - (40 * mult))
-    support2 = round(price - (100 * mult))
+    entry = price + 20 * mult
+    sl = price + 70 * mult
+    t1 = price - 45 * mult
+    t2 = price - 95 * mult
 
-    entry = round(price + (20 * mult))
-    sl = round(price + (70 * mult))
-
-    target1 = round(price - (45 * mult))
-    target2 = round(price - (95 * mult))
-
-    trend = "🚀 BULLISH" if price > resistance2 else "📉 BEARISH"
+    trend = "BULLISH 🚀" if price > r2 else "BEARISH 📉"
 
     return f"""
-📊 {index_key} ANALYSIS
+📊 {key}
 
-💰 Price: ₹{price:.2f}
-🕒 {datetime.now().strftime('%H:%M:%S')}
+Price: {price:.2f}
 
-━━━━━━━━━━━━━━
+ENTRY: {entry:.2f}
+SL: {sl:.2f}
+T1: {t1:.2f}
+T2: {t2:.2f}
 
-🎯 TRADE SETUP
+R1: {r1:.2f}
+R2: {r2:.2f}
 
-SELL ENTRY: {entry}
-STOP LOSS: {sl}
+Trend: {trend}
 
-TARGET 1: {target1}
-TARGET 2: {target2}
-
-━━━━━━━━━━━━━━
-
-📈 RESISTANCE
-R1: {resistance1}
-R2: {resistance2}
-
-📉 SUPPORT
-S1: {support1}
-S2: {support2}
-
-━━━━━━━━━━━━━━
-
-📊 TREND: {trend}
-
-⚡ Source: Groww API
+⏱ {datetime.now().strftime('%H:%M:%S')}
 """
 
-# ========================
-# COMMANDS
-# ========================
+# =========================
+# BACKGROUND UPDATER
+# =========================
+
+def updater():
+    while True:
+        for k in INDICES:
+            fetch_price(k)
+        time.sleep(2)
+
+# =========================
+# TELEGRAM COMMANDS
+# =========================
 
 @bot.message_handler(commands=['start', 'help'])
-def help_cmd(message):
-
-    bot.reply_to(
-        message,
-        """
-🤖 Groww Trading Bot
-
-Commands:
-
-/nifty
-/banknifty
-/sensex
-/live
-/alert 25000
-"""
+def help_cmd(msg):
+    bot.reply_to(msg,
+        "/nifty\n/banknifty\n/sensex\n/live\n/alert 25000"
     )
 
-# ========================
-# LIVE
-# ========================
-
-@bot.message_handler(commands=['live'])
-def live_cmd(message):
-
-    text = "📊 LIVE MARKET\n\n"
-
-    for key in INDICES:
-
-        price = get_price(key)
-
-        if price:
-            text += f"{INDICES[key]['name']}: ₹{price:.2f}\n"
-        else:
-            text += f"{INDICES[key]['name']}: ❌ unavailable\n"
-
-    text += f"\n🕒 {datetime.now().strftime('%H:%M:%S')}"
-
-    bot.reply_to(message, text)
-
-# ========================
-# INDEX COMMANDS
-# ========================
 
 @bot.message_handler(commands=['nifty'])
-def nifty_cmd(message):
-    bot.reply_to(
-        message,
-        generate_analysis("NIFTY", get_price("NIFTY"))
-    )
+def nifty(msg):
+    bot.reply_to(msg, analysis("NIFTY", get_price("NIFTY")))
+
 
 @bot.message_handler(commands=['banknifty'])
-def banknifty_cmd(message):
-    bot.reply_to(
-        message,
-        generate_analysis("BANKNIFTY", get_price("BANKNIFTY"))
-    )
+def bank(msg):
+    bot.reply_to(msg, analysis("BANKNIFTY", get_price("BANKNIFTY")))
+
 
 @bot.message_handler(commands=['sensex'])
-def sensex_cmd(message):
-    bot.reply_to(
-        message,
-        generate_analysis("SENSEX", get_price("SENSEX"))
-    )
+def sensex(msg):
+    bot.reply_to(msg, analysis("SENSEX", get_price("SENSEX")))
 
-# ========================
-# ALERT COMMAND
-# ========================
+
+@bot.message_handler(commands=['live'])
+def live(msg):
+    text = "LIVE PRICES\n\n"
+    for k in INDICES:
+        text += f"{k}: {get_price(k)}\n"
+    bot.reply_to(msg, text)
+
 
 @bot.message_handler(commands=['alert'])
-def alert_cmd(message):
-
+def alert(msg):
     try:
+        level = float(msg.text.split()[1])
+        chat_id = msg.chat.id
 
-        price_level = float(message.text.split()[1])
+        user_alerts.setdefault(chat_id, {}).setdefault("NIFTY", []).append(level)
 
-        chat_id = message.chat.id
-
-        if chat_id not in user_alerts:
-            user_alerts[chat_id] = {}
-
-        if "NIFTY" not in user_alerts[chat_id]:
-            user_alerts[chat_id]["NIFTY"] = []
-
-        user_alerts[chat_id]["NIFTY"].append(price_level)
-
-        bot.reply_to(
-            message,
-            f"✅ Alert added at ₹{price_level}"
-        )
+        bot.reply_to(msg, "Alert set!")
 
     except:
-        bot.reply_to(message, "Usage: /alert 25000")
+        bot.reply_to(msg, "Usage: /alert 25000")
 
-# ========================
+# =========================
 # MAIN
-# ========================
+# =========================
 
 if __name__ == "__main__":
+    print("Bot starting...")
 
-    print("🤖 Starting Groww Trading Bot...")
+    threading.Thread(target=updater, daemon=True).start()
 
-    if test_connection():
-
-        threading.Thread(
-            target=price_updater,
-            daemon=True
-        ).start()
-
-        print("🚀 Bot running...")
-
-        bot.infinity_polling()
-
-    else:
-        print("❌ Could not connect to Groww API")
+    bot.infinity_polling()
