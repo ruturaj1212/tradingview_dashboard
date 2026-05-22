@@ -3,7 +3,6 @@ import requests
 import threading
 import time
 from growwapi import GrowwAPI
-import pyotp
 from datetime import datetime
 
 # ========================
